@@ -13,3 +13,7 @@ data/.embeddings.json
 .DS_Store
 # local copy of the Streamlit Cloud secrets (paste into the app settings, never commit)
 streamlit-cloud-secrets.toml
+# local evaluation details and extra screenshots (the committed summary is evals/RESULTS.md)
+evals/results/
+demo/screenshots/*
+!demo/screenshots/07-stolen-card-lock-and-handoff.png

@@ -1,0 +1,155 @@
+[
+  {
+    "id": "card-abroad-en",
+    "title": "Using your card abroad",
+    "lang": "en",
+    "topic": "cards",
+    "valid_from": "2025-01-01",
+    "text": "Card payments in euros within the euro area are free. Payments in other currencies cost 2% of the amount. Cash withdrawals in other currencies cost 2% plus 3 EUR per withdrawal. Before travelling, check your payment limits in the app; you can raise them temporarily for 30 days."
+  },
+  {
+    "id": "card-abroad-fr",
+    "title": "Utiliser votre carte à l'étranger",
+    "lang": "fr",
+    "topic": "cards",
+    "valid_from": "2025-01-01",
+    "text": "Les paiements par carte en euros dans la zone euro sont gratuits. Les paiements dans une autre devise coûtent 2 % du montant. Les retraits dans une autre devise coûtent 2 % plus 3 EUR par retrait. Avant de voyager, vérifiez vos plafonds dans l'application ; vous pouvez les augmenter temporairement pendant 30 jours."
+  },
+  {
+    "id": "card-limits-en",
+    "title": "Card payment and withdrawal limits",
+    "lang": "en",
+    "topic": "cards",
+    "valid_from": "2025-01-01",
+    "text": "Default limits: Visa Classic allows 1,500 EUR of payments per rolling 30 days and 500 EUR of withdrawals per 7 days. Visa Premier allows 3,000 EUR of payments per 30 days and 1,000 EUR of withdrawals per 7 days. Mastercard Gold allows 4,000 EUR of payments per 30 days and 1,500 EUR of withdrawals per 7 days. You can raise your limits temporarily for 30 days in the app; this requires strong authentication. Permanent changes are made with your adviser."
+  },
+  {
+    "id": "card-limits-fr",
+    "title": "Plafonds de paiement et de retrait de la carte",
+    "lang": "fr",
+    "topic": "cards",
+    "valid_from": "2025-01-01",
+    "text": "Plafonds par défaut : la Visa Classic permet 1 500 EUR de paiements sur 30 jours glissants et 500 EUR de retraits sur 7 jours. La Visa Premier permet 3 000 EUR de paiements sur 30 jours et 1 000 EUR de retraits sur 7 jours. La Mastercard Gold permet 4 000 EUR de paiements sur 30 jours et 1 500 EUR de retraits sur 7 jours. Vous pouvez augmenter temporairement vos plafonds pendant 30 jours dans l'application, avec une authentification forte. Les modifications permanentes se font avec votre conseiller."
+  },
+  {
+    "id": "card-lock-en",
+    "title": "Temporarily lock or unlock your card",
+    "lang": "en",
+    "topic": "cards",
+    "valid_from": "2025-01-01",
+    "text": "You can temporarily lock your bank card at any time, for free, in the Demo Bank app (Cards > Temporary lock) or through the assistant. The lock is immediate: card payments and cash withdrawals are refused while the card is locked. It is reversible: unlocking re-enables the card instantly but requires strong authentication (a one-time secure code). A temporary lock is useful if you misplaced your card. If your card is lost or stolen, you must also declare an opposition, which blocks it permanently."
+  },
+  {
+    "id": "card-lock-fr",
+    "title": "Verrouiller ou déverrouiller temporairement votre carte",
+    "lang": "fr",
+    "topic": "cards",
+    "valid_from": "2025-01-01",
+    "text": "Vous pouvez verrouiller temporairement votre carte à tout moment, gratuitement, dans l'application Demo Bank (Cartes > Verrouillage temporaire) ou via l'assistant. Le verrouillage est immédiat : paiements par carte et retraits sont refusés tant que la carte est verrouillée. Il est réversible : le déverrouillage réactive la carte instantanément mais nécessite une authentification forte (code sécurisé à usage unique). En cas de perte ou de vol, vous devez aussi faire opposition, ce qui bloque la carte définitivement."
+  },
+  {
+    "id": "card-opposition-en",
+    "title": "Lost or stolen card: declare an opposition",
+    "lang": "en",
+    "topic": "cards",
+    "valid_from": "2025-01-01",
+    "text": "If your card is lost or stolen, lock it immediately, then declare an opposition. The opposition permanently blocks the card. You can declare it 24/7 in the app (Cards > Declare loss or theft) or by calling the opposition line on +33 1 00 00 00 00 (demo number). In case of theft, file a police report. A replacement card is sent within 5 business days; one replacement per year is free of charge. An adviser can help you review recent transactions and dispute fraudulent payments."
+  },
+  {
+    "id": "card-opposition-fr",
+    "title": "Carte perdue ou volée : faire opposition",
+    "lang": "fr",
+    "topic": "cards",
+    "valid_from": "2025-01-01",
+    "text": "En cas de perte ou de vol, verrouillez immédiatement votre carte puis faites opposition. L'opposition bloque définitivement la carte. Elle est possible 24h/24 et 7j/7 dans l'application (Cartes > Déclarer une perte ou un vol) ou par téléphone au +33 1 00 00 00 00 (numéro de démonstration). En cas de vol, déposez plainte. Une nouvelle carte est envoyée sous 5 jours ouvrés ; un remplacement par an est gratuit. Un conseiller peut vous aider à vérifier vos dernières opérations et contester les paiements frauduleux."
+  },
+  {
+    "id": "complaints-en",
+    "title": "How to file a complaint",
+    "lang": "en",
+    "topic": "contact",
+    "valid_from": "2025-01-01",
+    "text": "You can file a complaint with your adviser, by secure message, or through the complaints form in the app. Demo Bank acknowledges every complaint within 10 business days and sends a response within 2 months at the latest. If you are not satisfied with the answer, you can contact the Demo Bank mediator free of charge."
+  },
+  {
+    "id": "complaints-fr",
+    "title": "Déposer une réclamation",
+    "lang": "fr",
+    "topic": "contact",
+    "valid_from": "2025-01-01",
+    "text": "Vous pouvez déposer une réclamation auprès de votre conseiller, par message sécurisé ou via le formulaire de réclamation de l'application. Demo Bank accuse réception de chaque réclamation sous 10 jours ouvrables et y répond au plus tard sous 2 mois. Si la réponse ne vous satisfait pas, vous pouvez saisir gratuitement le médiateur de Demo Bank."
+  },
+  {
+    "id": "contact-en",
+    "title": "How to contact customer service",
+    "lang": "en",
+    "topic": "contact",
+    "valid_from": "2025-01-01",
+    "text": "Customer service advisers are available by phone Monday to Friday from 8:00 to 20:00 and Saturday from 9:00 to 13:00. Secure messages sent from the app are answered within 48 working hours. You can book an appointment with your branch adviser in the app (Contact > Book an appointment). The opposition line for lost or stolen cards is open 24/7."
+  },
+  {
+    "id": "contact-fr",
+    "title": "Contacter le service client",
+    "lang": "fr",
+    "topic": "contact",
+    "valid_from": "2025-01-01",
+    "text": "Les conseillers du service client sont joignables par téléphone du lundi au vendredi de 8h à 20h et le samedi de 9h à 13h. Les messages sécurisés envoyés depuis l'application reçoivent une réponse sous 48 heures ouvrées. Vous pouvez prendre rendez-vous avec le conseiller de votre agence dans l'application (Contact > Prendre rendez-vous). La ligne d'opposition carte est ouverte 24h/24, 7j/7."
+  },
+  {
+    "id": "fees-intl-transfer-2025-en",
+    "title": "International transfer fees (2025 tariff)",
+    "lang": "en",
+    "topic": "fees",
+    "valid_from": "2025-01-01",
+    "valid_to": "2025-12-31",
+    "text": "SEPA transfers in euros are free. Transfers outside the SEPA area cost 0.2% of the amount, with a minimum of 20 EUR and a maximum of 80 EUR, plus correspondent bank fees. Instant transfers cost 1 EUR. This tariff applies from 1 January to 31 December 2025."
+  },
+  {
+    "id": "fees-intl-transfer-2026-en",
+    "title": "International transfer fees (2026 tariff)",
+    "lang": "en",
+    "topic": "fees",
+    "valid_from": "2026-01-01",
+    "text": "SEPA transfers in euros are free, including instant transfers. Transfers outside the SEPA area cost 0.1% of the amount, with a minimum of 15 EUR and a maximum of 60 EUR, plus any fees charged by correspondent banks. Currency conversion uses the Demo Bank daily rate. This tariff applies from 1 January 2026."
+  },
+  {
+    "id": "fees-intl-transfer-2026-fr",
+    "title": "Frais des virements internationaux (tarifs 2026)",
+    "lang": "fr",
+    "topic": "fees",
+    "valid_from": "2026-01-01",
+    "text": "Les virements SEPA en euros sont gratuits, y compris les virements instantanés. Les virements hors zone SEPA coûtent 0,1 % du montant, avec un minimum de 15 EUR et un maximum de 60 EUR, plus les éventuels frais des banques correspondantes. La conversion de devises utilise le cours du jour Demo Bank. Ces tarifs s'appliquent depuis le 1er janvier 2026."
+  },
+  {
+    "id": "phishing-en",
+    "title": "Phishing: Demo Bank will never ask for your codes",
+    "lang": "en",
+    "topic": "security",
+    "valid_from": "2025-01-01",
+    "text": "Demo Bank will never ask you for your passwords, secure codes or full card number by phone, SMS or email, and will never ask you to validate an operation you did not initiate. If you receive such a request, do not answer, lock your card if you shared its details, and contact your adviser or the opposition line. Report phishing emails to phishing@demobank.example."
+  },
+  {
+    "id": "phishing-fr",
+    "title": "Hameçonnage : Demo Bank ne vous demandera jamais vos codes",
+    "lang": "fr",
+    "topic": "security",
+    "valid_from": "2025-01-01",
+    "text": "Demo Bank ne vous demandera jamais vos mots de passe, codes de sécurité ou numéro complet de carte par téléphone, SMS ou e-mail, ni de valider une opération que vous n'avez pas initiée. Si vous recevez une telle demande, ne répondez pas, verrouillez votre carte si vous en avez communiqué les données et contactez votre conseiller ou la ligne d'opposition. Signalez les e-mails suspects à phishing@demobank.example."
+  },
+  {
+    "id": "rib-en",
+    "title": "Get your bank details (IBAN / RIB)",
+    "lang": "en",
+    "topic": "accounts",
+    "valid_from": "2025-01-01",
+    "text": "Your bank details (RIB) including your IBAN and BIC can be downloaded as a PDF in the app (Accounts > select an account > Bank details) or in online banking. You can share them by email directly from the app. Never share your card number, secure codes or passwords with anyone who asks for your bank details."
+  },
+  {
+    "id": "rib-fr",
+    "title": "Obtenir votre RIB / IBAN",
+    "lang": "fr",
+    "topic": "accounts",
+    "valid_from": "2025-01-01",
+    "text": "Votre RIB, avec votre IBAN et votre BIC, est téléchargeable en PDF dans l'application (Comptes > choisir un compte > RIB) ou dans la banque en ligne. Vous pouvez le partager par e-mail directement depuis l'application. Ne communiquez jamais votre numéro de carte, vos codes ou mots de passe à une personne qui vous demande votre RIB."
+  }
+]

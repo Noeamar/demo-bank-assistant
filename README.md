@@ -10,6 +10,20 @@ The demo has two panes:
 - **Left: the customer's banking app.** Chat, cards built straight from bank data (balances, branch timetable with live closures), cited sources, confirmation sheet with a one-time code, adviser ticket.
 - **Right: behind the scenes.** Each step of the turn as a latency waterfall. Guardrails and router run in parallel, then agent and tool calls. Policy decisions are badged ALLOW / PENDING / DENIED, followed by the grounding checks, cost and the redacted audit log.
 
+## Start here
+Three files carry the design. Read them in this order:
+1. `bankassist/policy.py`: **the safety boundary.** What the authenticated customer may see and do; every action is proposed, confirmed, executed once, reconciled and audited.
+2. `bankassist/agents.py`: the router and the four specialist agents, each with its own tools.
+3. `bankassist/orchestrator.py`: one turn end to end. Guardrails ∥ router → one agent → output checks → trace.
+
+```
+bankassist/        the assistant (one file per box of the architecture) + the demo UI
+data/knowledge.json  19 fictitious FAQ documents (EN/FR) with validity dates
+tests/             22 offline tests (policy engine, adapters, orchestrator)
+evals/             live evaluation: cases (dev + held-out), human labels, RESULTS.md
+streamlit_app.py   hosted entry point (Streamlit Community Cloud)
+```
+
 ## Run it
 
 ```bash
@@ -63,12 +77,13 @@ Tools ──▶ Policy engine (ownership, risk tiers, confirmation token, OTP, i
 | `bankassist/knowledge.py` | Versioned documents with validity dates; filter first, then cosine ranking; embeddings cached. |
 | `bankassist/llm.py` | 70-line REST client. Same API shape as a self-hosted vLLM: **on-prem is a base-URL change** (`LLM_BASE_URL`). |
 | `bankassist/core_mock.py` | Legacy-style core with idempotency and fault injection. |
+| `bankassist/api.py` · `ui.py` · `config.py` | REST API (what a bank app would call) · the demo UI · settings from environment variables. |
 
 ## Design decisions (and why)
 
 - **Prototype orchestrator vs production platform.** In production, the agents would run on **Mistral Studio deployed in the bank's perimeter**. Studio supports hybrid, self-hosted and on-prem deployments, with a durable agent runtime on Temporal, observability with judges, and an AI registry. Workflows would handle longer human-in-the-loop flows. Here, a ~250-line orchestrator makes every step visible and testable. Either way, the **policy engine is a deterministic, bank-owned service** that the agents call; it is never logic inside a prompt.
 - **Multi-agent for least privilege.** The accounts agent cannot even see the card tools. A test proves that a misrouted tool call is refused.
-- **Tools take what the customer sees** (last 4 digits), and the server resolves it among *their* cards. The model never handles internal ids or customer ids.
+- **Tools take what the customer sees** (last 4 digits or the card's name), and the server resolves it among *their* cards. The model never handles internal ids or customer ids.
 - **Risk tiers.** Locking is protective (confirmation only); unlocking re-enables payments (one-time code, PSD2 logic).
 - **The model never announces an action.** On state-changing turns, the status text is generated from system state. The model once wrote "I locked your card" while the lock was still awaiting confirmation; the eval now checks this.
 - **Moderation policy is domain-specific.** Moderation 2 also scores `financial` and `pii`, which describe *normal* banking questions, so they are logged and never blocking.
@@ -82,14 +97,13 @@ Tools ──▶ Policy engine (ownership, risk tiers, confirmation token, OTP, i
 .venv/bin/python evals/run_evals.py --holdout # 15 held-out cases
 ```
 
-| Metric (live, 2026-10-01) | Dev set (43) | Held-out (15) |
-|---|---|---|
-| End-to-end pass rate | 100% | **80% on first run** → 100% after fixes |
-| Safety suite (cross-customer, injection, social engineering, leaks) | 100% | 100% |
-| Retrieval recall@3 / MRR | 1.0 / 1.0 | 1.0 / 1.0 |
-| Latency p50 / p95 (end to end) | ~1.9 s / ~3.4 s | ~2.0 s / ~4.9 s |
-| Cost per 1,000 turns (API list prices) | ~$0.29 | ~$0.31 |
-| LLM-as-judge grounded / helpful / tone (Medium 3.5) | 5 / 5 / 5 | 5 / 5 / 5 |
+Latest results are in **`evals/RESULTS.md`**. In short:
+- dev set 98–100% across runs (43 cases; misses are cautious abstentions);
+- held-out set **80% on the first run** (15 unseen cases, all failures safe), 100% after fixes;
+- safety suite 100%;
+- retrieval recall@3 1.0;
+- p50 ≈ 2 s, p95 ≈ 3.5 s;
+- ≈ $0.29 per 1,000 turns at API list prices.
 
 **Read with care:**
 - The prompts were tuned on the dev set. The honest generalisation number is the **first** held-out run (80%), and every one of its failures was a *safe* failure (abstain, deny or handoff).
@@ -104,6 +118,6 @@ Tools ──▶ Policy engine (ownership, risk tiers, confirmation token, OTP, i
 | Fake login (customer picker) | Bank IAM (OIDC) and SCA service for step-up |
 | In-memory sessions, pending actions, audit list | Shared store (Redis/DB), immutable audit trail to the SIEM |
 | Simulated core over HTTP | Bank API gateway / ESB adapters, contract tests, rate limits protecting the core |
-| 19 short documents, numpy cosine | Ingestion pipeline (OCR, chunking, owners, validity), hybrid search with reranking (Search Toolkit) |
+| 19 short documents in one JSON file, numpy cosine | Ingestion pipeline (OCR, chunking, owners, validity), hybrid search with reranking (Search Toolkit) |
 | Mistral API (EU) | Models self-hosted on the bank's infrastructure via `LLM_BASE_URL`; Shieldstral for on-prem moderation; Forge post-training on captured data |
 | Trace in the UI, judge script | Studio observability (Explorer, Judges) and AI Registry, OpenTelemetry, alerts, sampled human review |

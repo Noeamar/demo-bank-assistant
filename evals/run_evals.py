@@ -1,8 +1,8 @@
 """Evaluation harness: end-to-end behaviour, retrieval quality, LLM-as-judge, safety, latency and cost.
 
 Runs the real assistant with live Mistral models against the simulated core (in-process, reset per case).
-Usage: python evals/run_evals.py [--no-judge] [--only k01,c04]
-Output: evals/results/latest.json and evals/results/summary.md
+Usage: python evals/run_evals.py [--holdout] [--no-judge] [--only k01,c04]
+Output: evals/RESULTS.md (committed summary) and evals/results/*.json (local details, not committed)
 """
 
 import csv
@@ -126,8 +126,8 @@ def main():
     only = next((a.split("=", 1)[1] if "=" in a else sys.argv[sys.argv.index(a) + 1]
                  for a in sys.argv if a.startswith("--only")), None)
     use_judge = "--no-judge" not in sys.argv
-    case_file = "holdout.jsonl" if "--holdout" in sys.argv else "cases.jsonl"
-    cases = [json.loads(line) for line in (HERE / case_file).read_text().splitlines()]
+    split = "holdout" if "--holdout" in sys.argv else "dev"
+    cases = [c for c in map(json.loads, (HERE / "cases.jsonl").read_text().splitlines()) if c["split"] == split]
     if only:
         cases = [c for c in cases if c["id"] in only.split(",")]
 
@@ -163,13 +163,31 @@ def main():
               f"{row['ms']:5}ms {'; '.join(failures)}")
 
     summary = summarise(results, retrieval_metrics(kb, cases))
+    if only:                       # partial runs are for debugging: never overwrite the recorded results
+        print(to_markdown(summary))
+        return
     out_dir = HERE / "results"
     out_dir.mkdir(exist_ok=True)
     stem = "holdout" if "--holdout" in sys.argv else "latest"
     (out_dir / f"{stem}.json").write_text(json.dumps({"summary": summary, "cases": results}, indent=2,
                                                     ensure_ascii=False))
     (out_dir / f"{stem}-summary.md").write_text(to_markdown(summary))
+    write_results_md(out_dir)
     print(to_markdown(summary))
+
+
+def write_results_md(out_dir):
+    """One committed file with the latest dev and held-out summaries."""
+    parts = ["# Evaluation results\n",
+             "Live models, simulated bank. Prompts were tuned on the dev set; the held-out set measures "
+             "generalisation. **First held-out run, before any fix: 80% (12/15), all failures safe** "
+             "(abstain, deny or handoff). That set has been used since, so the next one must come from real "
+             "questions.\n"]
+    for title, stem in [("Development set", "latest"), ("Held-out set", "holdout")]:
+        path = out_dir / f"{stem}-summary.md"
+        if path.exists():
+            parts.append(f"## {title}\n\n" + path.read_text().split("\n", 2)[2])
+    (HERE / "RESULTS.md").write_text("\n".join(parts))
 
 
 def summarise(results, retrieval):

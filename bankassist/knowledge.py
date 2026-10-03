@@ -11,21 +11,19 @@ from . import config
 CACHE = config.DATA / ".embeddings.json"
 
 
-def parse(path):
-    """Markdown file with a small front matter (id, title, lang, topic, valid_from, valid_to)."""
-    _, head, body = path.read_text().split("---", 2)
-    meta = dict(line.split(":", 1) for line in head.strip().splitlines())
-    meta = {k.strip(): v.strip() for k, v in meta.items()}
-    meta["valid_from"] = date.fromisoformat(meta["valid_from"])
-    meta["valid_to"] = date.fromisoformat(meta.get("valid_to", "2099-12-31"))
-    meta["text"] = body.strip()
-    return meta
+def load(path):
+    """Approved documents with metadata: id, title, lang, topic, validity dates, text."""
+    docs = json.loads(path.read_text())
+    for d in docs:
+        d["valid_from"] = date.fromisoformat(d["valid_from"])
+        d["valid_to"] = date.fromisoformat(d.get("valid_to", "2099-12-31"))
+    return docs
 
 
 class Knowledge:
-    def __init__(self, llm, folder=config.DATA / "knowledge"):
+    def __init__(self, llm, path=config.DATA / "knowledge.json"):
         self.llm = llm
-        self.docs = [parse(p) for p in sorted(folder.glob("*.md"))]
+        self.docs = load(path)
         self.cache = json.loads(CACHE.read_text()) if CACHE.exists() else {}
         missing = [d for d in self.docs if self._key(d) not in self.cache]
         if missing:  # embed once, reuse across restarts
