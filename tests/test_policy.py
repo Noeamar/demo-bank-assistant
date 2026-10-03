@@ -53,6 +53,11 @@ def test_cannot_touch_another_customers_card(env):
 def test_card_resolved_from_last4_or_choice_required(env):
     _, policy, alice, bob, _ = env
     assert policy.card(alice, "9876").id == "K-1002"
+    assert policy.card(alice, "visa premier").id == "K-1001"        # the name the customer uses
+    with pytest.raises(NeedsChoice):
+        policy.card(alice, "Visa")                                   # ambiguous name: ask
+    with pytest.raises(Denied):
+        policy.card(alice, "Mastercard")                             # Bob's card: not hers
     assert policy.card(bob).id == "K-2001"                 # single card: no need to ask
     with pytest.raises(NeedsChoice):
         policy.card(alice)                                  # two cards: ask which one

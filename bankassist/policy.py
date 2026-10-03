@@ -93,6 +93,11 @@ class Policy:
         for c in cards:
             if ref in (c.id, c.last4):
                 return c
+        named = [c for c in cards if ref.strip().lower() in c.label.lower()]   # "my Visa Premier"
+        if len(named) == 1:
+            return named[0]
+        if len(named) > 1:
+            raise NeedsChoice([{"card": c.label, "last4": c.last4, "status": c.status} for c in named])
         self.audit.log(session, "deny", {"resource": ref})
         raise Denied(ref)
 

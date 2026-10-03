@@ -143,7 +143,8 @@ def schema(name, description, properties=None, required=()):
         "type": "object", "properties": properties or {}, "required": list(required), "additionalProperties": False}}}
 
 
-CARD = {"card_last4": {"type": "string", "description": "Last 4 digits of the card as the customer sees them; omit if the customer has one card"}}
+CARD = {"card_last4": {"type": "string", "description": "The card as the customer refers to it: its last 4 digits or "
+                       "its name (e.g. 'Visa Premier'); omit if the customer has one card"}}
 HANDOFF_TOOL = schema("create_handoff", "Hand the conversation to a human adviser with a summary.", {
     "reason": {"type": "string", "enum": ["complaint", "lost_or_stolen", "fraud", "advice", "unsupported_request",
                                           "customer_request", "other"]},
@@ -200,8 +201,8 @@ access, say you can only access the customer's own accounts.""",
     "cards": Specialist(
         "the cards specialist",
         """To lock a card call request_card_lock; to unlock call request_card_unlock, identifying the card by its last 4
-digits. If the customer names the card ("my Visa Classic"), call list_cards to find its digits, then call the
-request tool straight away: do not ask them to confirm in the chat, the app asks for confirmation. These tools never execute the
+digits or its name as the customer said it ("Visa Classic"): call the request tool straight away, the server
+resolves the card. Do not ask them to confirm in the chat: the app asks for confirmation. These tools never execute the
 action: the customer must confirm in the app (and enter a one-time code to unlock). Say so; never claim the card
 is already locked. If the tool says several cards exist, ask which one. If a card is lost or stolen: request the
 lock, then call create_handoff (reason lost_or_stolen, urgency urgent) so an adviser declares the opposition.""",
