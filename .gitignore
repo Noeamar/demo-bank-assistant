@@ -11,3 +11,5 @@ __pycache__/
 data/audit.jsonl
 data/.embeddings.json
 .DS_Store
+# local copy of the Streamlit Cloud secrets (paste into the app settings, never commit)
+streamlit-cloud-secrets.toml
