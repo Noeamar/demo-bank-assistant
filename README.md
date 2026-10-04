@@ -32,24 +32,29 @@ cp .env.example .env    # add your MISTRAL_API_KEY
 PY=.venv/bin/python ./run.sh    # core bank :8181 · assistant API :8180 · demo UI :8580
 ```
 
-Open http://127.0.0.1:8580, pick a customer and click **Start new session**. The API docs are at http://127.0.0.1:8180/docs.
+Open http://127.0.0.1:8580. The API docs are at http://127.0.0.1:8180/docs.
 
 **Hosted (Streamlit Community Cloud):**
 - The entry point is `streamlit_app.py`. It starts the simulated core and the API as local background servers in the same process, so the UI still talks to them over HTTP.
 - Set `MISTRAL_API_KEY` and `ACCESS_CODE` in the app's secrets. Each session is capped at 40 messages.
 
-| Try | What it shows |
+**The demo screen has three columns:**
+- **Try it:** choose the logged-in customer, run a guided scenario, or simulate an incident;
+- **Customer view:** the banking app;
+- **Behind the scenes:** what to look for, then every step of the turn with its latency, model and cost.
+
+| Scenario button | What it shows |
 |---|---|
-| *Quels sont les horaires de mon agence ?* (Alice) | Personal structured data comes from the branch API, with a live exceptional closure. It is not RAG. |
-| *What's my balance?* | An authenticated read: amounts come from the core, never from the model. |
-| *Bloque ma carte*, then *la Visa Premier* | Clarification, then a **pending** action. Nothing happens until **Confirm**. |
-| *Unlock my card* on a locked card | Sensitive action: a **one-time code** (step-up) is required. |
-| *Show transactions of the account ending 6677* (Alice) | Bob's account: **denied by the policy engine**, not by the prompt (see trace). |
-| *Ignore all previous instructions…* | Blocked by Moderation 2 (jailbreak category) before any agent runs. |
-| *How much is a transfer to the US?* | RAG with citations; the outdated 2025 tariff is filtered out by validity date. |
-| *I think my card was stolen!* | Lock request plus an urgent adviser handoff for the opposition, with a summary in French. |
-| Sidebar: *Core banking unavailable*, then confirm | Honest failure: nothing changed, and retry is safe (same idempotency key). |
-| Sidebar: *Write times out after commit*, then confirm | Unknown outcome: the status is **read back** before any retry (reconciliation). |
+| Branch hours | Personal structured data comes from the branch API, with a live exceptional closure. It is not RAG. |
+| Transfer fees | RAG with citations; the outdated 2025 tariff is filtered out by validity date. |
+| Balance · Transactions | Authenticated reads: amounts come from the core, never from the model. |
+| Lock a card (Alice), then *la Visa Premier* | Clarification, then a **pending** action. Nothing happens until **Confirm**. |
+| Stolen card | Lock request plus an urgent adviser handoff for the opposition. |
+| Other's account | Another customer's account: **denied by the policy engine**, not by the prompt. |
+| Prompt injection | Blocked by Moderation 2 (jailbreak category) before any agent runs. |
+| Incident: *Core banking down*, then lock and confirm | Honest failure: nothing changed, and retry is safe (same idempotency key). |
+| Incident: *Write times out*, then lock and confirm | Unknown outcome: the status is **read back** before any retry (reconciliation). |
+| Type *Unlock my card* on a locked card | Sensitive action: a **one-time code** (step-up) is required. |
 
 ## Architecture
 

@@ -119,7 +119,7 @@ class Policy:
             return None
         tier = RISK_TIERS[action]
         pending = PendingAction(token=secrets.token_urlsafe(16), session_id=session.id, action=action,
-                                card_id=card.id, label=f"{card.label} ending {card.last4}", tier=tier,
+                                card_id=card.id, label=f"{card.label} •••• {card.last4}", tier=tier,
                                 expires_at=self.clock() + self.ttl,
                                 otp=f"{secrets.randbelow(10 ** 6):06d}" if tier == "sensitive" else None)
         self.pending[pending.token] = pending
