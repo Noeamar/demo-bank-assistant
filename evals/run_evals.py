@@ -57,6 +57,8 @@ def check(case, out):
     reply = out["reply"].replace("\u202f", " ").replace("\xa0", " ")   # French number formatting
     if "route" in e and out["route"] not in e["route"]:
         failures.append(f"route {out['route']}")
+    if "language" in e and out["language"] != e["language"]:
+        failures.append(f"language {out['language']}")
     if "tool" in e and e["tool"] not in out["tools"]:
         failures.append(f"missing tool {e['tool']}")
     if outcome_of(out) not in e["outcome"]:
@@ -111,6 +113,7 @@ def retrieval_metrics(kb, cases):
         hits1 += doc in ids[:1]
         hits3 += doc in ids[:3]
         rr += 1 / (ids.index(doc) + 1) if doc in ids else 0
+    n = max(n, 1)                  # partial runs may contain no retrieval case
     return {"cases": n, "recall@1": round(hits1 / n, 3), "recall@3": round(hits3 / n, 3), "mrr": round(rr / n, 3)}
 
 

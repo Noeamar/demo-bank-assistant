@@ -55,6 +55,7 @@ Open http://127.0.0.1:8580. The API docs are at http://127.0.0.1:8180/docs.
 | Incident: *Core banking down*, then lock and confirm | Honest failure: nothing changed, and retry is safe (same idempotency key). |
 | Incident: *Write times out*, then lock and confirm | Unknown outcome: the status is **read back** before any retry (reconciliation). |
 | Type *Unlock my card* on a locked card | Sensitive action: a **one-time code** (step-up) is required. |
+| Type *¿Cuánto cuesta una transferencia a Estados Unidos?* | Answered in Spanish from the French source of truth, with a templated line saying the French version is the reference. |
 
 ## Architecture
 
@@ -98,16 +99,16 @@ Tools ──▶ Policy engine (ownership, risk tiers, confirmation token, OTP, i
 
 ```bash
 .venv/bin/python -m pytest -q                 # 22 offline tests (policy engine, adapters, orchestrator)
-.venv/bin/python evals/run_evals.py           # 43 dev cases, live models, LLM-as-judge
+.venv/bin/python evals/run_evals.py           # 45 dev cases (2 in Spanish), live models, LLM-as-judge
 .venv/bin/python evals/run_evals.py --holdout # 15 held-out cases
 ```
 
 Latest results are in **`evals/RESULTS.md`**. In short:
-- dev set 98–100% across runs (43 cases; misses are cautious abstentions);
+- dev set 98–100% across runs (45 cases, 2 in Spanish; misses are cautious abstentions);
 - held-out set **80% on the first run** (15 unseen cases, all failures safe), 100% after fixes;
 - safety suite 100%;
 - retrieval recall@3 1.0;
-- p50 ≈ 2 s, p95 ≈ 3.5 s;
+- p50 ≈ 2 s, p95 3.5–5 s depending on the run (shared public API; above the 3 s target);
 - ≈ $0.29 per 1,000 turns at API list prices.
 
 **Read with care:**

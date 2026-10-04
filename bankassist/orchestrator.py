@@ -11,28 +11,46 @@ TEXT = {
     "blocked": {"en": "I can't help with that request. If you need assistance with your accounts or cards, "
                       "I'm here, or I can connect you with an adviser.",
                 "fr": "Je ne peux pas traiter cette demande. Je peux vous aider pour vos comptes et vos cartes, "
-                      "ou vous mettre en relation avec un conseiller."},
+                      "ou vous mettre en relation avec un conseiller.",
+                "es": "No puedo atender esa solicitud. Puedo ayudarle con sus cuentas y tarjetas, o ponerle en "
+                      "contacto con un asesor."},
     "chitchat": {"en": "Hello! I'm Demo Bank's AI assistant. I can answer questions about our products and fees, "
                        "give your balances and recent transactions, tell you your branch's opening hours, and lock "
                        "or unlock your card. For anything else, I'll connect you with an adviser.",
                  "fr": "Bonjour ! Je suis l'assistant IA de Demo Bank. Je peux répondre à vos questions sur nos "
                        "produits et tarifs, vous donner vos soldes et opérations, les horaires de votre agence, et "
                        "verrouiller ou déverrouiller votre carte. Pour le reste, je vous mets en relation avec un "
-                       "conseiller."},
+                       "conseiller.",
+                 "es": "¡Hola! Soy el asistente de IA de Demo Bank. Puedo responder a sus preguntas sobre productos "
+                       "y tarifas, darle sus saldos y movimientos, el horario de su oficina, y bloquear o desbloquear "
+                       "su tarjeta. Para lo demás, le pongo en contacto con un asesor."},
     "abstain": {"en": "I don't have a verified answer to that in our documentation. Would you like me to connect "
                       "you with an adviser?",
                 "fr": "Je n'ai pas de réponse vérifiée dans notre documentation. Voulez-vous que je vous mette en "
-                      "relation avec un conseiller ?"},
+                      "relation avec un conseiller ?",
+                "es": "No tengo una respuesta verificada en nuestra documentación. ¿Quiere que le ponga en contacto "
+                      "con un asesor?"},
     "pending_lock": {"en": "To lock your {card}, please confirm below. Nothing happens until you confirm.",
                      "fr": "Pour verrouiller votre {card}, confirmez ci-dessous. Rien ne se passe avant votre "
-                           "confirmation."},
+                           "confirmation.",
+                     "es": "Para bloquear su {card}, confirme abajo. No se hará nada sin su confirmación."},
     "pending_unlock": {"en": "To unlock your {card}, confirm below and enter the one-time code sent by SMS.",
-                       "fr": "Pour déverrouiller votre {card}, confirmez ci-dessous et saisissez le code reçu par SMS."},
+                       "fr": "Pour déverrouiller votre {card}, confirmez ci-dessous et saisissez le code reçu par SMS.",
+                       "es": "Para desbloquear su {card}, confirme abajo e introduzca el código recibido por SMS."},
     "handoff": {"en": "An adviser will contact you {when} (ticket {ticket}){purpose}.",
-                "fr": "Un conseiller vous contactera {when} (ticket {ticket}){purpose}."},
+                "fr": "Un conseiller vous contactera {when} (ticket {ticket}){purpose}.",
+                "es": "Un asesor se pondrá en contacto con usted {when} (ticket {ticket}){purpose}."},
     "error": {"en": "Sorry, the assistant is temporarily unavailable. Nothing was changed on your accounts.",
-              "fr": "Désolé, l'assistant est momentanément indisponible. Rien n'a été modifié sur vos comptes."},
+              "fr": "Désolé, l'assistant est momentanément indisponible. Rien n'a été modifié sur vos comptes.",
+              "es": "Lo sentimos, el asistente no está disponible en este momento. No se ha modificado nada en sus "
+                    "cuentas."},
 }
+WHEN = {"fr": {"within 2 business hours": "sous 2 heures ouvrées", "within 24 hours": "sous 24 heures"},
+        "es": {"within 2 business hours": "en un plazo de 2 horas hábiles", "within 24 hours": "en 24 horas"}}
+REFERENCE_FR = {"es": "La versión de referencia de nuestra documentación está en francés."}
+OPPOSITION = {"en": " to declare the opposition (permanent block)",
+              "fr": " pour faire opposition (blocage définitif)",
+              "es": " para tramitar la oposición (bloqueo definitivo)"}
 
 
 class Trace:
@@ -93,6 +111,8 @@ class Assistant:
                 trace.add("error", type(exc).__name__)
                 reply = TEXT["error"][lang]
             reply = self._check_output(decision["route"], message, reply, ctx, trace, lang)
+            if ctx.sources and lang in REFERENCE_FR and reply != TEXT["abstain"][lang]:
+                reply += "\n\n" + REFERENCE_FR[lang]     # answered from French content: say which text is binding
 
         session.history += [{"role": "user", "content": message}, {"role": "assistant", "content": reply}]
         return {"reply": reply, "route": decision["route"], "language": lang, "flags": decision["flags"],
@@ -138,11 +158,7 @@ class Assistant:
         lines = [TEXT["pending_lock" if p.action == "lock_card" else "pending_unlock"][lang].format(card=p.label)
                  for p in ctx.pending]
         for h in ctx.handoffs:
-            when = {"within 2 business hours": "sous 2 heures ouvrées", "within 24 hours": "sous 24 heures"}.get(
-                h["expected_contact"], h["expected_contact"]) if lang == "fr" else h["expected_contact"]
-            purpose = ""
-            if h["reason"] == "lost_or_stolen":
-                purpose = (" pour faire opposition (blocage définitif)" if lang == "fr"
-                           else " to declare the opposition (permanent block)")
+            when = WHEN.get(lang, {}).get(h["expected_contact"], h["expected_contact"])
+            purpose = OPPOSITION[lang] if h["reason"] == "lost_or_stolen" else ""
             lines.append(TEXT["handoff"][lang].format(when=when, ticket=h["ticket"], purpose=purpose))
         return " ".join(lines)
