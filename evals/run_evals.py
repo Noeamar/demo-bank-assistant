@@ -232,7 +232,7 @@ def _rate(values):
 
 
 def to_markdown(s):
-    lines = [f"# Evaluation — {s['date']}", "",
+    lines = [f"# Evaluation, {s['date']}", "",
              f"Models: router `{s['models']['router']}`, agents `{s['models']['agents']}`, judge `{s['models']['judge']}`", "",
              "| Metric | Value |", "|---|---|",
              f"| End-to-end pass rate | {s['pass_rate']:.0%} ({s['cases']} cases) |",

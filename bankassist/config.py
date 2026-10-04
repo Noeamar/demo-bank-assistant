@@ -27,7 +27,7 @@ CORE_TIMEOUT_S = float(os.getenv("CORE_TIMEOUT_S", "1.5"))
 CONFIRMATION_TTL_S = int(os.getenv("CONFIRMATION_TTL_S", "120"))
 MAX_TOOL_ROUNDS = 3
 
-# USD per million tokens (list prices, Sept 2026) — used to show cost per turn in the trace.
+# USD per million tokens (list prices, Sept 2026), used to show cost per turn in the trace.
 PRICES = {
     "ministral-8b-2512": (0.15, 0.15),
     "mistral-small-2603": (0.15, 0.60),

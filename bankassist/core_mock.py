@@ -1,7 +1,7 @@
 """Simulated legacy core banking system (separate process, port 8181).
 
-It deliberately speaks a "legacy" dialect — upper-case codes, amounts in cents as strings,
-dates as YYYYMMDD, return codes — so the adapter layer has real translation work to do.
+It deliberately speaks a "legacy" dialect (upper-case codes, amounts in cents as strings,
+dates as YYYYMMDD, return codes), so the adapter layer has real translation work to do.
 Fault injection lets the demo show outages and a write that succeeds but times out.
 Run: uvicorn bankassist.core_mock:app --port 8181
 """

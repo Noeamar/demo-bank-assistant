@@ -12,7 +12,7 @@ The demo has two panes:
 
 ## Start here
 Three files carry the design. Read them in this order:
-1. `bankassist/policy.py`: **the safety boundary.** What the authenticated customer may see and do; every action is proposed, confirmed, executed once, reconciled and audited.
+1. `bankassist/policy.py`: **the safety boundary.** What the authenticated customer may see and do; every action is proposed, confirmed, executed once, checked again after a timeout, and audited.
 2. `bankassist/agents.py`: the router and the four specialist agents, each with its own tools.
 3. `bankassist/orchestrator.py`: one turn end to end. Guardrails ∥ router → one agent → output checks → trace.
 
@@ -52,8 +52,8 @@ Open http://127.0.0.1:8580. The API docs are at http://127.0.0.1:8180/docs.
 | Stolen card | Lock request plus an urgent adviser handoff for the opposition. |
 | Other's account | Another customer's account: **denied by the policy engine**, not by the prompt. |
 | Prompt injection | Blocked by Moderation 2 (jailbreak category) before any agent runs. |
-| Incident: *Core banking down*, then lock and confirm | Honest failure: nothing changed, and retry is safe (same idempotency key). |
-| Incident: *Write times out*, then lock and confirm | Unknown outcome: the status is **read back** before any retry (reconciliation). |
+| Incident: *Core banking down*, then lock and confirm | Honest failure: nothing changed, and a retry is safe (the same confirmation can only execute once). |
+| Incident: *Write times out*, then lock and confirm | Unknown outcome: the status is **read back** before any retry. |
 | Type *Unlock my card* on a locked card | Sensitive action: a **one-time code** (step-up) is required. |
 | Type *¿Cuánto cuesta una transferencia a Estados Unidos?* | Answered in Spanish from the French source of truth, with a templated line saying the French version is the reference. |
 
@@ -69,20 +69,20 @@ Channel (UI) ──REST──▶ API ──▶ Orchestrator
                                  │     handoff:   create_handoff
                                  └─ output guardrails: citations → grounding verifier → repair or abstain
                                                        · action status from system state · PAN leak
-Tools ──▶ Policy engine (ownership, risk tiers, confirmation token, OTP, idempotency, audit)
+Tools ──▶ Policy engine (ownership, risk tiers, confirmation token, SMS code, executed once, audit)
       ──▶ Adapters (anti-corruption layer) ──HTTP──▶ simulated legacy core (codes, cents, YYYYMMDD)
 ```
 
 | Module | Role |
 |---|---|
-| `bankassist/policy.py` | **The safety boundary.** Identity comes from the session, never from model arguments. Ownership checks. Actions: propose → customer confirms (OTP if sensitive) → execute once → reconcile → audit (PII redacted). |
+| `bankassist/policy.py` | **The safety boundary.** Identity comes from the session, never from model arguments. Ownership checks. Actions: propose → customer confirms (SMS code if sensitive) → execute once → read back after a timeout → audit (personal data masked). |
 | `bankassist/agents.py` | Router prompt and schema; four specialists, each with its own tool allowlist; bounded tool loop. |
 | `bankassist/orchestrator.py` | Guardrails and routing in parallel, specialist call, output checks, trace with latency, tokens and cost. |
-| `bankassist/guardrails.py` | Domain-tuned moderation policy, injection patterns, PII redaction, citation check, grounding verifier and repair. |
+| `bankassist/guardrails.py` | Domain-tuned moderation policy, injection patterns, personal-data masking, citation check, grounding verifier and repair. |
 | `bankassist/adapters.py` | Typed domain objects; timeouts mapped to `CoreUnavailable` (nothing happened) or `OutcomeUnknown` (maybe happened). |
 | `bankassist/knowledge.py` | Versioned documents with validity dates; filter first, then cosine ranking; embeddings cached. |
 | `bankassist/llm.py` | 70-line REST client. Same API shape as a self-hosted vLLM: **on-prem is a base-URL change** (`LLM_BASE_URL`). |
-| `bankassist/core_mock.py` | Legacy-style core with idempotency and fault injection. |
+| `bankassist/core_mock.py` | Legacy-style core that executes each write once (unique key) and can simulate failures. |
 | `bankassist/api.py` · `ui.py` · `config.py` | REST API (what a bank app would call) · the demo UI · settings from environment variables. |
 
 ## Design decisions (and why)
@@ -115,15 +115,15 @@ Latest results are in **`evals/RESULTS.md`**. In short:
 - The prompts were tuned on the dev set. The honest generalisation number is the **first** held-out run (80%), and every one of its failures was a *safe* failure (abstain, deny or handoff).
 - The held-out set is now spent: the next one must come from real, anonymised client questions.
 - The judge needs calibration before its scores mean anything. Fill `evals/human_labels.csv` (1/0 per answer) and rerun: agreement and Cohen's κ are reported.
-- Small synthetic sets, one region, no load test: these are not production SLAs.
+- Small synthetic sets, one region, no load test: these are not production commitments.
 
 ## Prototype vs production
 
 | Here | In production |
 |---|---|
-| Fake login (customer picker) | Bank IAM (OIDC) and SCA service for step-up |
-| In-memory sessions, pending actions, audit list | Shared store (Redis/DB), immutable audit trail to the SIEM |
-| Simulated core over HTTP | Bank API gateway / ESB adapters, contract tests, rate limits protecting the core |
+| Fake login (customer picker) | The bank's login system, and strong authentication (SMS or app) for sensitive actions |
+| In-memory sessions, pending actions, audit list | Shared store (Redis or a database), tamper-proof audit trail to the bank's security monitoring |
+| Simulated core over HTTP | Adapters on the bank's API gateway and integration layer, contract tests, rate limits protecting the core |
 | 19 short documents in one JSON file, numpy cosine | Ingestion pipeline (OCR, chunking, owners, validity), hybrid search with reranking (Search Toolkit) |
 | Mistral API (EU) | Models self-hosted on the bank's infrastructure via `LLM_BASE_URL`; Shieldstral for on-prem moderation; Forge post-training on captured data |
 | Trace in the UI, judge script | Studio observability (Explorer, Judges) and AI Registry, OpenTelemetry, alerts, sampled human review |
