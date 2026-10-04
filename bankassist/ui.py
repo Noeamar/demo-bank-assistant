@@ -256,12 +256,31 @@ def badge(step):
     return BADGES.get(outcome, ("", ""))
 
 
+PERSONAL_DATA_TOOLS = {"get_accounts", "get_transactions", "list_cards", "get_branch_hours"}
+
+
+def policy_decision(last):
+    """What the bank's rules decided this turn: the point of the design, so it comes first."""
+    outcomes = {s.get("outcome") for s in last["trace"]}
+    if last["blocked"]:
+        return "Blocked", "by the input guardrails"
+    if outcomes & {"not_authorized", "tool_not_allowed"}:
+        return "Denied", "by the policy engine"
+    if last["pending"]:
+        return "Pending", "until the customer confirms"
+    if PERSONAL_DATA_TOOLS & set(last["tools"]):
+        return "Allowed", "own data only, ownership checked"
+    return "None needed", "no personal data or action"
+
+
 def render_trace(last):
     t = last["totals"]
+    agent = "None" if last["blocked"] or last["route"] == "chitchat" else last["route"].capitalize()
+    decision, why = policy_decision(last)
     c1, c2, c3 = st.columns(3)
-    for col, value, lab in [(c1, f"{t['ms'] / 1000:.2f} s", "end-to-end latency"),
+    for col, value, lab in [(c1, agent, "specialist agent"),
                             (c2, t["llm_calls"], "model calls"),
-                            (c3, f"${t['cost_usd'] * 1000:.2f}", "cost per 1,000 turns")]:
+                            (c3, decision, why)]:
         col.markdown(f'<div class="stat"><div class="v">{value}</div><div class="l">{lab}</div></div>',
                      unsafe_allow_html=True)
     route = f'ROUTE · {last["route"].upper()} · {last["language"].upper()}' + (" · BLOCKED" if last["blocked"] else "")
@@ -283,7 +302,8 @@ def render_trace(last):
                     f'<div class="model" style="text-align:right">{str(s["ms"]) + " ms" if "ms" in s else ""}</div>'
                     f'<div class="detail">{detail}</div></div>')
     st.markdown("".join(rows), unsafe_allow_html=True)
-    st.caption("Orange bars run in sequence; yellow bars (guardrails ∥ router) run in parallel.")
+    st.caption("Orange bars run in sequence; yellow bars (guardrails and router) run in parallel. Timings are "
+               "indicative: shared public API, not your infrastructure.")
     for h in last["handoffs"]:
         st.markdown(f'<div class="card"><div class="mono">Handoff ticket for the adviser · {h["urgency"]}</div>'
                     f'{html.escape(h["summary"])}</div>', unsafe_allow_html=True)

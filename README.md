@@ -108,7 +108,7 @@ Latest results are in **`evals/RESULTS.md`**. In short:
 - held-out set **80% on the first run** (15 unseen cases, all failures safe), 100% after fixes;
 - safety suite 100%;
 - retrieval recall@3 1.0;
-- p50 ≈ 2 s, p95 3.5–5 s depending on the run (shared public API; above the 3 s target);
+- latency ≈ 2 s median, indicative only (one user on the shared public API; real numbers come from a load test on the target infrastructure);
 - ≈ $0.29 per 1,000 turns at API list prices.
 
 **Read with care:**
